@@ -44,11 +44,23 @@ public class ClientServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         BufferedReader reader = req.getReader();
-        Client client = gson.fromJson(reader, Client.class);
+        Client incomingClient = gson.fromJson(reader, Client.class);
 
-        clientDAO.addClient(client);
-        resp.setStatus(HttpServletResponse.SC_CREATED);
+        Client existingClient = clientDAO.getClientByEmail(incomingClient.getEmail());
+
+        if (existingClient != null) {
+            log.info("Client with email {} already exists (ID: {})", existingClient.getEmail(), existingClient.getId());
+            resp.setStatus(HttpServletResponse.SC_CONFLICT); // 409 Conflict
+            resp.getWriter().write(gson.toJson(existingClient));
+        } else {
+            clientDAO.addClient(incomingClient);
+            log.info("Created new client with email {}", incomingClient.getEmail());
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+            resp.setContentType("application/json");
+            resp.getWriter().write(gson.toJson(incomingClient));
+        }
     }
+
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {

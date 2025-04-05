@@ -17,7 +17,6 @@ public class ClientDAO {
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("email"),
-                        rs.getString("phone"),
                         rs.getBoolean("is_regular")
                 ));
             }
@@ -25,6 +24,25 @@ public class ClientDAO {
             e.printStackTrace();
         }
         return clients;
+    }
+    public Client getClientByEmail(String email) {
+        String query = "SELECT * FROM clients WHERE email = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Client(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getBoolean("is_regular")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Client getClientById(int clientId) {
@@ -38,7 +56,6 @@ public class ClientDAO {
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("email"),
-                        rs.getString("phone"),
                         rs.getBoolean("is_regular")
                 );
             }
@@ -49,13 +66,12 @@ public class ClientDAO {
     }
 
     public void addClient(Client client) {
-        String query = "INSERT INTO clients (name, email, phone, is_regular) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO clients (name, email,  is_regular) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, client.getName());
             stmt.setString(2, client.getEmail());
-            stmt.setString(3, client.getPhone());
-            stmt.setBoolean(4, client.isRegular());
+            stmt.setBoolean(3, client.isRegular());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -63,14 +79,13 @@ public class ClientDAO {
     }
 
     public boolean updateClient(Client client) {
-        String query = "UPDATE clients SET name = ?, email = ?, phone = ?, is_regular = ? WHERE id = ?";
+        String query = "UPDATE clients SET name = ?, email = ?, is_regular = ? WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, client.getName());
             stmt.setString(2, client.getEmail());
-            stmt.setString(3, client.getPhone());
-            stmt.setBoolean(4, client.isRegular());
-            stmt.setInt(5, client.getId());
+            stmt.setBoolean(3, client.isRegular());
+            stmt.setInt(4, client.getId());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

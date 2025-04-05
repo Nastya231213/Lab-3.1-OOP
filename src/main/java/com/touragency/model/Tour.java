@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public class Tour {
     private int id;
     private String name;
-    private String type;
+    private TourType type;
     private BigDecimal price;
     private boolean isHot;
 }

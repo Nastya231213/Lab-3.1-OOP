@@ -1,6 +1,7 @@
 package com.touragency.dao;
 
 import com.touragency.model.Tour;
+import com.touragency.model.TourType;
 import com.touragency.util.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class TourDAO {
                 tours.add(new Tour(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getString("type"),
+                        TourType.fromId(rs.getInt("type")),
                         rs.getBigDecimal("price"),
                         rs.getBoolean("is_hot")
                 ));
@@ -33,7 +34,7 @@ public class TourDAO {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, tour.getName());
-            stmt.setString(2, tour.getType());
+            stmt.setInt(2, tour.getType().getId());
             stmt.setBigDecimal(3, tour.getPrice());
             stmt.setBoolean(4, tour.isHot());
             stmt.executeUpdate();
@@ -47,7 +48,7 @@ public class TourDAO {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, tour.getName());
-            stmt.setString(2, tour.getType());
+            stmt.setInt(2, tour.getType().getId());
             stmt.setBigDecimal(3, tour.getPrice());
             stmt.setBoolean(4, tour.isHot());
             stmt.setInt(5, tour.getId());
